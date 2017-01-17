@@ -4,9 +4,12 @@ class NoAPIKeyError:
     pass
 
 def check_auth(func):
-    def inner(*args, **kwargs):
+    def inner(self, *args, **kwargs):
         if not self.key:
             raise NoAPIKeyError('No api key set')
+        else:
+            return func(self, *args, **kwargs)
+    return inner
 
 class BeardApiClient:
     def __init__(self, **kwargs):
@@ -19,7 +22,7 @@ class BeardApiClient:
         self.key = kwargs.get('key', None)
         self.default_chat = kwargs.get('default_chat', None)
     
-    #@check_auth
+    @check_auth
     def send_message(self, text, chat_id = None):
         if not chat_id:
             try:
@@ -37,12 +40,3 @@ class BeardApiClient:
         print(url)
         response = requests.post(url, json = payload)
         return response
-                
-
-    
-
-
- 
-
-
-
